@@ -1,5 +1,5 @@
-
-FROM golang:1.24.3-alpine
+# Етап збірки
+FROM golang:1.24.3-alpine AS builder
 
 WORKDIR /usr/local/app
 
@@ -9,6 +9,11 @@ RUN go mod tidy
 COPY . .
 RUN go build -o build/fizzbuzz
 
-EXPOSE 8080
+# Етап запуску
+FROM scratch
 
-CMD ["build/fizzbuzz", "serve"]
+WORKDIR /app
+COPY --from=builder /usr/local/app/build/fizzbuzz ./fizzbuzz
+
+EXPOSE 8080
+CMD ["./fizzbuzz", "serve"]
